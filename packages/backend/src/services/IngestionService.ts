@@ -334,24 +334,24 @@ export class IngestionService {
 				
 				if (newPath !== existingPath) {
 					logger.info(
-						{ 
-							messageId, 
-							ingestionSourceId: source.id, 
-							oldPath: existingPath, 
-							newPath: newPath 
+						{
+							messageId,
+							ingestionSourceId: source.id,
+							oldPath: existingPath,
+							newPath,
 						},
 						'Email moved to different folder, updating path'
 					);
-					
+
 					// Update the path in the database
 					await db
 						.update(archivedEmails)
 						.set({ path: newPath })
 						.where(eq(archivedEmails.id, existingEmail.id));
-					
-					// Note: We don't need to move the physical file or update the search index
-					// because the storagePath includes the folder in the path already and is not changed.
-					// The 'path' field is just metadata about which folder the email is in on the source server.
+
+					// Note: We don't need to move the physical file or update the search index.
+					// The storagePath was set when the email was first imported and remains unchanged.
+					// The 'path' field is just metadata tracking which folder the email currently resides in on the source server.
 				} else {
 					logger.debug(
 						{ messageId, ingestionSourceId: source.id },
